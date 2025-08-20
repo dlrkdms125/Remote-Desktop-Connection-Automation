@@ -88,17 +88,15 @@ def login_and_get_firstname(page, app_id: str) -> str:
 
     # 6) User 컬럼이 정확히 app_id인 행 선택
     row = fr.locator(
-        f"xpath=//table//tbody//tr[normalize-space(td[1])='{app_id}']"
+    f"xpath=//table[@id='result_list']//tbody//tr[td[2]/a[normalize-space(text())='{app_id}']]"
     ).first
     row.wait_for(state="visible", timeout=10000)
 
-    # 7) 'First Name' 값 추출
-    headers = [h.strip() for h in fr.locator("xpath=//table//thead//th").all_inner_texts()]
-    try:
-        col_idx = headers.index("First Name") + 1
-    except ValueError:
-        col_idx = 2  # fallback: 스샷 기준 두 번째 컬럼
-    first_name = row.locator(f"xpath=td[{col_idx}]").inner_text().strip()
+
+   # 7) 'First name' 값 추출
+    first_name = row.locator("xpath=td[3]").inner_text().strip()
     return first_name
+
+
 
 
