@@ -1,6 +1,4 @@
-﻿# automation/app/auth_server.py
-from pathlib import Path
-from playwright.sync_api import TimeoutError as PWTimeout
+﻿from playwright.sync_api import TimeoutError as PWTimeout
 from . import selectors as S
 from .config import AUTH_URL, AUTH_USER, AUTH_PASS
 
@@ -22,17 +20,15 @@ def _first(root, sels, timeout=8000):
 
 def _find_search_root(page):
     """
-    우측 상단 'Search for local users' 입력창이 들어있는 정확한 root(page 또는 frame)를 찾아서 반환.
-    FortiAuthenticator UI는 메인 콘텐츠가 iframe에 들어가는 경우가 많으므로 모든 frame을 순회한다.
+    'Search for local users' 입력창이 들어있는 정확한 root(page 또는 frame)를 반환.
     """
     candidates = [
         "input[placeholder='Search for local users']",
-        "input[placeholder*='Search for local users']",
         "input[placeholder*='Search']",
         "input[type='search']",
     ]
 
-    # 1) 메인 프레임 먼저 확인
+    # 메인 프레임
     for sel in candidates:
         loc = page.locator(sel)
         if loc.count():
@@ -42,7 +38,7 @@ def _find_search_root(page):
             except Exception:
                 pass
 
-    # 2) 모든 iframe에서 검색
+    # iframe 순회
     for fr in page.frames:
         for sel in candidates:
             loc = fr.locator(sel)
@@ -55,48 +51,43 @@ def _find_search_root(page):
 
     return None
 
+
 def login_and_get_firstname(page, app_id: str) -> str:
-    # 1) 로그인
+    # 1) 인증 서버 로그인
     page.goto(AUTH_URL, wait_until="domcontentloaded")
-    _first(page, S.LOGIN_USER).fill(AUTH_USER)
-    _first(page, S.LOGIN_PASS).fill(AUTH_PASS)
-    _first(page, S.LOGIN_SUBMIT).click()
+    _first(page, S.AUTH_LOGIN_USER).fill(AUTH_USER)
+    _first(page, S.AUTH_LOGIN_PASS).fill(AUTH_PASS)
+    _first(page, S.AUTH_LOGIN_SUBMIT).click()
     page.wait_for_load_state("networkidle")
 
-    # 2) 좌측 메뉴로 Local Users 이동
+    # 2) 좌측 메뉴 → Local Users 이동
     page.locator("a:has-text('Authentication')").first.click()
     page.locator("a:has-text('User Management')").first.click()
     page.locator("a:has-text('Local Users')").first.click()
 
-    # 3) 본문 프레임(main_frame) 로드 확인
+    # 3) 검색창이 있는 frame 찾기
     fr = page.frame(name="main_frame")
     if not fr:
         raise RuntimeError("main_frame 프레임을 찾을 수 없습니다.")
     fr.locator("#result_list thead").wait_for(state="visible", timeout=15000)
 
     # 4) 검색창 찾기
-    search = fr.locator("#searchbar")
-    search.wait_for(state="visible", timeout=15000)
+    search = _first(fr, S.LOCAL_USERS_SEARCH, timeout=15000)
 
     # 5) 검색 수행
     search.click()
     search.press("Control+A")
     search.press("Delete")
     search.fill(app_id)
-    search.press("Enter")              # 엔터 입력 추가
-    page.wait_for_timeout(1000)        # 테이블 반영 대기
+    search.press("Enter")
+    page.wait_for_timeout(1000)
 
     # 6) User 컬럼이 정확히 app_id인 행 선택
     row = fr.locator(
-    f"xpath=//table[@id='result_list']//tbody//tr[td[2]/a[normalize-space(text())='{app_id}']]"
+        f"xpath=//table[@id='result_list']//tbody//tr[td[2]/a[normalize-space(text())='{app_id}']]"
     ).first
     row.wait_for(state="visible", timeout=10000)
 
-
-   # 7) 'First name' 값 추출
+    # 7) 'First name' 값 추출
     first_name = row.locator("xpath=td[3]").inner_text().strip()
     return first_name
-
-
-
-

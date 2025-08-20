@@ -16,7 +16,7 @@ def _first(page, sels, timeout=4000):
 def login_vpn(page, which: str):
     url = VPN1_URL if which.upper() == "VPN1" else VPN2_URL
     page.goto(url, wait_until="domcontentloaded")
-    _first(page, S.LOGIN_USER).fill(VPN_USER)
-    _first(page, S.LOGIN_PASS).fill(VPN_PASS)
-    _first(page, S.LOGIN_SUBMIT).click()
+    _first(page, S.VPN_LOGIN_USER).fill(VPN_USER)
+    _first(page, S.VPN_LOGIN_PASS).fill(VPN_PASS)
+    _first(page, S.VPN_LOGIN_SUBMIT).click()
     page.wait_for_load_state("networkidle")

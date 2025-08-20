@@ -1,8 +1,18 @@
 # 로그인 폼
-LOGIN_USER   = ["#username", "#id_username", "input[name='username']"]
-LOGIN_PASS   = ["#password", "#id_password", "input[name='password']"]
-LOGIN_SUBMIT = ["button[type=submit]", "input[type=submit]", "button:has-text('Login')"]
+# --- 인증 서버 ---
+AUTH_LOGIN_USER = ["#id_username", "input[name='username']"]
+AUTH_LOGIN_PASS = ["#id_password", "input[name='password']"]
+AUTH_LOGIN_SUBMIT = ["input[type='submit']", "button[type='submit']"]
 
+# --- VPN ---
+VPN_LOGIN_USER = ["#username", "input[name='username']"]
+VPN_LOGIN_PASS = ["#secretkey", "input[name='secretkey']"]
+VPN_LOGIN_SUBMIT = [
+    "#login_button",           # 정확히 VPN1 버튼 id
+    "button[name='login_button']",
+    "button.primary",          # class로 fallback
+    "button:has-text('Login')" # 텍스트로 fallback
+]
 # 인증 서버 내 네비게이션
 NAV_AUTH       = "Authentication"
 NAV_USER_MGMT  = "User Management"
