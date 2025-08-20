@@ -73,7 +73,7 @@ def login_and_get_firstname(page, app_id: str) -> str:
     fr = page.frame(name="main_frame")
     if not fr:
         raise RuntimeError("main_frame 프레임을 찾을 수 없습니다.")
-    fr.locator("table thead").wait_for(state="visible", timeout=15000)
+    fr.locator("#result_list thead").wait_for(state="visible", timeout=15000)
 
     # 4) DataTables 검색창 찾기 (placeholder 여부와 무관하게)
     search = fr.locator(

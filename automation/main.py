@@ -31,7 +31,7 @@ def main():
     # 인자 없으면 터미널에서 입력
     args = prompt_if_missing(args)
 
-    pw, browser, ctx, page = launch(headless=not args.headful)
+    pw, browser, ctx, page = launch(headless=False)
     try:
         print("[1] 인증서버 로그인 & First Name 확인")
         first_name = login_and_get_firstname(page, args.app_id)
