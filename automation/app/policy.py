@@ -1,14 +1,9 @@
 ﻿# automation/app/policy.py
 from . import selectors as S
 
-def goto_firewall_policy(page):
-    page.get_by_role("link", name=S.MENU_POLICY, exact=False).first.click()
-    page.get_by_role("link", name=S.MENU_FIREWALL, exact=False).first.click()
-    page.wait_for_load_state("networkidle")
-
 def search_policy(page, app_id: str):
     # 1. Policy & Objects → Firewall Policy로 이동
-    page.locator("a:has-text('Policy & Objects')").click()
+    page.locator("//span[contains(normalize-space(), 'Policy')]/ancestor::a").click()
     page.locator("a:has-text('Firewall Policy')").click()
     page.wait_for_load_state("networkidle")
 
@@ -28,6 +23,7 @@ def search_policy(page, app_id: str):
     ).first
     row.wait_for(state="visible", timeout=10000)
     return row
+
 
 def open_edit(page, row):
     row.click(button="right")

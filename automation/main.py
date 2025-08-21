@@ -3,7 +3,7 @@ from automation.app.browser import launch, close
 from automation.app.auth_server import login_and_get_firstname
 from automation.app.vpn_login import login_vpn
 from automation.app.policy import (
-    goto_firewall_policy, search_policy, open_edit,
+    search_policy, open_edit,
     set_source_dest, create_onetime_schedule, enable_and_save
 )
 from automation.app.config import build_schedule_name, split_date_time
@@ -44,8 +44,7 @@ def main():
             print("[WARN] VPN1/VPN2 아님. 계속 진행할지 확인 필요")
 
         print("[3] Policy & Objects → Firewall Policy 이동, 검색/편집")
-        goto_firewall_policy(page)
-        row = search_policy(page, args.app_id)
+        row = search_policy(page, args.app_id)   # ✅ 여기서 바로 검색
         open_edit(page, row)
 
         print("[4] Source/Destination 설정")
