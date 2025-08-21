@@ -20,3 +20,12 @@ def login_vpn(page, which: str):
     _first(page, S.VPN_LOGIN_PASS).fill(VPN_PASS)
     _first(page, S.VPN_LOGIN_SUBMIT).click()
     page.wait_for_load_state("networkidle")
+
+    # FortiOS 팝업 처리 (OK 버튼)
+    try:
+        ok_btn = page.locator("button.ok-button.primary").first
+        ok_btn.wait_for(state="visible", timeout=5000)
+        ok_btn.click()
+
+    except Exception:
+        print("[INFO] FortiOS 팝업 없음")

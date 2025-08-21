@@ -7,14 +7,26 @@ def goto_firewall_policy(page):
     page.wait_for_load_state("networkidle")
 
 def search_policy(page, app_id: str):
-    for s in S.FIREWALL_SEARCH:
-        el = page.locator(s)
-        if el.count():
-            el.first.fill(app_id)
-            el.first.press("Enter")
-            break
-    row = page.locator(f"tr:has-text('{app_id}')").first
-    row.wait_for(state="visible", timeout=7000)
+    # 1. Policy & Objects → Firewall Policy로 이동
+    page.locator("a:has-text('Policy & Objects')").click()
+    page.locator("a:has-text('Firewall Policy')").click()
+    page.wait_for_load_state("networkidle")
+
+    # 2. 검색창 찾기
+    search = page.locator("input.search-input[placeholder='Search']").first
+    search.wait_for(state="visible", timeout=10000)
+
+    # 3. 검색 실행
+    search.click()
+    search.fill(app_id)
+    search.press("Enter")
+    page.wait_for_timeout(1000)
+
+    # 4. 결과 행 반환
+    row = page.locator(
+        f"xpath=//table//tr[td[contains(normalize-space(), '{app_id}')]]"
+    ).first
+    row.wait_for(state="visible", timeout=10000)
     return row
 
 def open_edit(page, row):
